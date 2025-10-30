@@ -205,3 +205,23 @@ require_once ASTRA_THEME_DIR . 'inc/core/markup/class-astra-markup.php';
 require_once ASTRA_THEME_DIR . 'inc/core/deprecated/deprecated-filters.php';
 require_once ASTRA_THEME_DIR . 'inc/core/deprecated/deprecated-hooks.php';
 require_once ASTRA_THEME_DIR . 'inc/core/deprecated/deprecated-functions.php';
+
+/**
+ * Enqueue global header and footer styling overrides.
+ */
+if ( ! function_exists( 'bengpt_uniform_header_footer_assets' ) ) {
+        /**
+         * Load the custom stylesheet that keeps header and footer styling consistent.
+         *
+         * @since 1.0.0 bengpt customization.
+         */
+        function bengpt_uniform_header_footer_assets() {
+                wp_enqueue_style(
+                        'bengpt-header-footer',
+                        ASTRA_THEME_URI . 'assets/css/custom-header-footer.css',
+                        array( 'astra-theme-css' ),
+                        ASTRA_THEME_VERSION
+                );
+        }
+}
+add_action( 'wp_enqueue_scripts', 'bengpt_uniform_header_footer_assets', 20 );
