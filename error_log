@@ -1,0 +1,78 @@
+[01-May-2025 12:53:49 UTC] Cron reschedule event error for hook: es_remote_admin_notices, Error code: invalid_schedule, Error message: Event schedule does not exist., Data: {"schedule":"5min","args":[],"interval":300}
+[01-May-2025 12:53:56 UTC] Cron reschedule event error for hook: es_remote_admin_notices, Error code: invalid_schedule, Error message: Event schedule does not exist., Data: {"schedule":"5min","args":[],"interval":300}
+[01-May-2025 14:45:35 UTC] Cron reschedule event error for hook: action_scheduler_run_queue, Error code: invalid_schedule, Error message: Event schedule does not exist., Data: {"schedule":"every_minute","args":["WP Cron"],"interval":60}
+[09-May-2025 19:26:52 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1041
+[09-May-2025 19:26:52 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1041
+[09-May-2025 19:26:52 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1041
+[10-May-2025 18:54:18 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1041
+[10-May-2025 18:54:22 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1041
+[10-May-2025 18:54:22 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1041
+[10-May-2025 18:54:22 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1041
+[10-May-2025 19:13:57 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1041
+[10-May-2025 19:14:33 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1041
+[02-Jun-2025 22:03:24 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function astra_primary_navigation() in /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/header.php:94
+Stack trace:
+#0 /home/zjz6wpzkxcoq/public_html/wp-includes/template.php(810): require_once()
+#1 /home/zjz6wpzkxcoq/public_html/wp-includes/template.php(745): load_template()
+#2 /home/zjz6wpzkxcoq/public_html/wp-includes/general-template.php(48): locate_template()
+#3 /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/page.php(20): get_header()
+#4 /home/zjz6wpzkxcoq/public_html/wp-includes/template-loader.php(106): include('/home/zjz6wpzkx...')
+#5 /home/zjz6wpzkxcoq/public_html/wp-blog-header.php(19): require_once('/home/zjz6wpzkx...')
+#6 /home/zjz6wpzkxcoq/public_html/index.php(17): require('/home/zjz6wpzkx...')
+#7 {main}
+  thrown in /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/header.php on line 94
+[02-Jun-2025 22:03:25 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function astra_primary_navigation() in /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/header.php:94
+Stack trace:
+#0 /home/zjz6wpzkxcoq/public_html/wp-includes/template.php(810): require_once()
+#1 /home/zjz6wpzkxcoq/public_html/wp-includes/template.php(745): load_template()
+#2 /home/zjz6wpzkxcoq/public_html/wp-includes/general-template.php(48): locate_template()
+#3 /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/page.php(20): get_header()
+#4 /home/zjz6wpzkxcoq/public_html/wp-includes/template-loader.php(106): include('/home/zjz6wpzkx...')
+#5 /home/zjz6wpzkxcoq/public_html/wp-blog-header.php(19): require_once('/home/zjz6wpzkx...')
+#6 /home/zjz6wpzkxcoq/public_html/index.php(17): require('/home/zjz6wpzkx...')
+#7 {main}
+  thrown in /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/header.php on line 94
+[02-Jun-2025 22:03:31 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function astra_primary_navigation() in /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/header.php:94
+Stack trace:
+#0 /home/zjz6wpzkxcoq/public_html/wp-includes/template.php(810): require_once()
+#1 /home/zjz6wpzkxcoq/public_html/wp-includes/template.php(745): load_template()
+#2 /home/zjz6wpzkxcoq/public_html/wp-includes/general-template.php(48): locate_template()
+#3 /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/page.php(20): get_header()
+#4 /home/zjz6wpzkxcoq/public_html/wp-includes/template-loader.php(106): include('/home/zjz6wpzkx...')
+#5 /home/zjz6wpzkxcoq/public_html/wp-blog-header.php(19): require_once('/home/zjz6wpzkx...')
+#6 /home/zjz6wpzkxcoq/public_html/index.php(17): require('/home/zjz6wpzkx...')
+#7 {main}
+  thrown in /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/header.php on line 94
+[02-Jun-2025 22:03:43 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function astra_primary_navigation() in /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/header.php:94
+Stack trace:
+#0 /home/zjz6wpzkxcoq/public_html/wp-includes/template.php(810): require_once()
+#1 /home/zjz6wpzkxcoq/public_html/wp-includes/template.php(745): load_template()
+#2 /home/zjz6wpzkxcoq/public_html/wp-includes/general-template.php(48): locate_template()
+#3 /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/page.php(20): get_header()
+#4 /home/zjz6wpzkxcoq/public_html/wp-includes/template-loader.php(106): include('/home/zjz6wpzkx...')
+#5 /home/zjz6wpzkxcoq/public_html/wp-blog-header.php(19): require_once('/home/zjz6wpzkx...')
+#6 /home/zjz6wpzkxcoq/public_html/index.php(17): require('/home/zjz6wpzkx...')
+#7 {main}
+  thrown in /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/header.php on line 94
+[02-Jun-2025 22:03:51 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function astra_primary_navigation() in /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/header.php:94
+Stack trace:
+#0 /home/zjz6wpzkxcoq/public_html/wp-includes/template.php(810): require_once()
+#1 /home/zjz6wpzkxcoq/public_html/wp-includes/template.php(745): load_template()
+#2 /home/zjz6wpzkxcoq/public_html/wp-includes/general-template.php(48): locate_template()
+#3 /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/page.php(20): get_header()
+#4 /home/zjz6wpzkxcoq/public_html/wp-includes/template-loader.php(106): include('/home/zjz6wpzkx...')
+#5 /home/zjz6wpzkxcoq/public_html/wp-blog-header.php(19): require_once('/home/zjz6wpzkx...')
+#6 /home/zjz6wpzkxcoq/public_html/index.php(17): require('/home/zjz6wpzkx...')
+#7 {main}
+  thrown in /home/zjz6wpzkxcoq/public_html/wp-content/themes/astra/header.php on line 94
+[27-Oct-2025 20:16:12 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1047
+[27-Oct-2025 20:16:16 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1047
+[27-Oct-2025 20:16:16 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1047
+[27-Oct-2025 20:16:16 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1047
+[28-Oct-2025 20:23:01 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1047
+[28-Oct-2025 20:23:01 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1047
+[28-Oct-2025 20:23:01 UTC] PHP Warning:  Undefined array key "_column_size" in /home/zjz6wpzkxcoq/public_html/wp-content/plugins/elementor/includes/elements/column.php on line 1047
+[29-Oct-2025 15:30:42 UTC] PHP Warning:  file_get_contents(https://quickchart.io/map?c={type:'osm',center:[46.8335046,-71.3361026],zoom:11,markers:[{lat:46.8335046,lng:-71.3361026}]}): Failed to open stream: HTTP request failed! HTTP/1.1 404 Not Found
+ in /home/zjz6wpzkxcoq/public_html/send_form.php on line 47
+[29-Oct-2025 15:36:26 UTC] PHP Warning:  file_get_contents(https://quickchart.io/map?c={type:'osm',center:[46.840696,-71.271057],zoom:11,markers:[{lat:46.840696,lng:-71.271057}]}): Failed to open stream: HTTP request failed! HTTP/1.1 404 Not Found
+ in /home/zjz6wpzkxcoq/public_html/send_form.php on line 47
