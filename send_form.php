@@ -8,7 +8,7 @@ $destinataire = "benoit@re-maxcommercial.ca";
 $copie_cci    = "info@re-maxcommercial.ca";
 $nom_expediteur = "Formulaire Re/Max Commercial";
 $objet = "Nouvelle demande d'information – Re/Max Commercial";
-$sendgrid_api_key = "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";
+$sendgrid_api_key = "";
 
 // ------------------------------------------------
 // Collecte des champs du formulaire
