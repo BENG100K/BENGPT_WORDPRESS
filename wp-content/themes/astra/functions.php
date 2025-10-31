@@ -320,6 +320,15 @@ if ( ! function_exists( 'bengpt_force_all_pages_in_navigation' ) ) {
                         return $items;
                 }
 
+                // Respect any menu items that have already been assigned to the location.
+                if ( '' !== trim( $items ) ) {
+                        return $items;
+                }
+
+                if ( function_exists( 'has_nav_menu' ) && has_nav_menu( $args->theme_location ) ) {
+                        return $items;
+                }
+
                 $pages_items = bengpt_build_pages_menu_items( $args );
 
                 if ( '' === $pages_items ) {
