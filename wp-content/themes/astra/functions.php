@@ -225,3 +225,164 @@ if ( ! function_exists( 'bengpt_uniform_header_footer_assets' ) ) {
         }
 }
 add_action( 'wp_enqueue_scripts', 'bengpt_uniform_header_footer_assets', 20 );
+
+if ( ! function_exists( 'bengpt_build_pages_menu_items' ) ) {
+        /**
+         * Build a navigation list that contains every published page so menus stay in sync automatically.
+         *
+         * @param WP_Nav_Menu_Args $context_args The arguments passed to wp_nav_menu().
+         *
+         * @return string
+         */
+        function bengpt_build_pages_menu_items( $context_args ) {
+                $list_args = array(
+                        'title_li'           => '',
+                        'echo'               => false,
+                        'sort_column'        => 'menu_order,post_title',
+                        'link_before'        => '',
+                        'link_after'         => '',
+                        'depth'              => 0,
+                        'bengpt_global_menu' => true,
+                );
+
+                if ( class_exists( 'Astra_Walker_Page' ) ) {
+                        $list_args['walker'] = new Astra_Walker_Page();
+                }
+
+                $current_id = get_queried_object_id();
+                if ( $current_id ) {
+                        $list_args['current_page'] = $current_id;
+                }
+
+                /**
+                 * Allow customization of the page query used to build the automatic navigation.
+                 *
+                 * @param array           $list_args    Arguments passed into wp_list_pages().
+                 * @param WP_Nav_Menu_Args $context_args Original nav menu arguments.
+                 */
+                $list_args = apply_filters( 'bengpt_global_pages_menu_args', $list_args, $context_args );
+
+                $pages_markup = trim( wp_list_pages( $list_args ) );
+
+                if ( '' === $pages_markup ) {
+                        return '';
+                }
+
+                $include_home = apply_filters( 'bengpt_global_pages_menu_include_home', 'page' !== get_option( 'show_on_front' ), $context_args );
+                $home_markup  = '';
+
+                if ( $include_home ) {
+                        $home_label = apply_filters( 'bengpt_global_pages_menu_home_label', __( 'Home', 'astra' ), $context_args );
+
+                        $home_classes = array(
+                                'menu-item',
+                                'menu-item-type-custom',
+                                'menu-item-object-custom',
+                                'menu-item-home',
+                                'page_item',
+                                'page-item-home',
+                        );
+
+                        if ( is_front_page() && ! is_paged() ) {
+                                $home_classes[] = 'current-menu-item';
+                                $home_classes[] = 'current_page_item';
+                        }
+
+                        $home_markup = sprintf(
+                                '<li class="%1$s"><a class="menu-link" href="%2$s">%3$s</a></li>',
+                                esc_attr( implode( ' ', array_unique( $home_classes ) ) ),
+                                esc_url( home_url( '/' ) ),
+                                esc_html( $home_label )
+                        );
+                }
+
+                return $home_markup . $pages_markup;
+        }
+}
+
+if ( ! function_exists( 'bengpt_force_all_pages_in_navigation' ) ) {
+        /**
+         * Replace targeted WordPress menus with an automatically generated list of all pages.
+         *
+         * @param string          $items Existing menu items markup.
+         * @param WP_Nav_Menu_Args $args  Menu arguments.
+         *
+         * @return string
+         */
+        function bengpt_force_all_pages_in_navigation( $items, $args ) {
+                if ( empty( $args->theme_location ) ) {
+                        return $items;
+                }
+
+                $target_locations = apply_filters( 'bengpt_global_pages_menu_locations', array( 'primary', 'mobile_menu' ), $args );
+
+                if ( ! in_array( $args->theme_location, $target_locations, true ) ) {
+                        return $items;
+                }
+
+                $pages_items = bengpt_build_pages_menu_items( $args );
+
+                if ( '' === $pages_items ) {
+                        return $items;
+                }
+
+                return $pages_items;
+        }
+}
+add_filter( 'wp_nav_menu_items', 'bengpt_force_all_pages_in_navigation', 20, 2 );
+
+if ( ! function_exists( 'bengpt_mark_pages_as_menu_items' ) ) {
+        /**
+         * Ensure automatically generated page links inherit menu item styling classes.
+         *
+         * @param array $css_class    Array of CSS classes to apply to the page menu item.
+         * @param WP_Post $page       The current page object.
+         * @param int   $depth        Menu depth.
+         * @param mixed $args         Arguments passed to wp_list_pages().
+         * @param int   $current_page Current page ID.
+         *
+         * @return array
+         */
+        function bengpt_mark_pages_as_menu_items( $css_class, $page, $depth, $args, $current_page ) {
+                $is_global_menu = false;
+
+                if ( is_array( $args ) && ! empty( $args['bengpt_global_menu'] ) ) {
+                        $is_global_menu = true;
+                } elseif ( is_object( $args ) && ! empty( $args->bengpt_global_menu ) ) {
+                        $is_global_menu = true;
+                }
+
+                if ( ! $is_global_menu ) {
+                        return $css_class;
+                }
+
+                $css_class[] = 'menu-item';
+                $css_class[] = 'menu-item-type-page';
+                $css_class[] = 'menu-item-object-page';
+
+                return array_values( array_unique( $css_class ) );
+        }
+}
+add_filter( 'page_css_class', 'bengpt_mark_pages_as_menu_items', 10, 5 );
+
+if ( ! function_exists( 'bengpt_force_uniform_page_template' ) ) {
+        /**
+         * Force every page to load the theme's default page template for visual consistency.
+         *
+         * @param string $template The path to the template WordPress resolved.
+         *
+         * @return string
+         */
+        function bengpt_force_uniform_page_template( $template ) {
+                if ( is_page() ) {
+                        $default_template = locate_template( 'page.php' );
+
+                        if ( $default_template && $default_template !== $template ) {
+                                return $default_template;
+                        }
+                }
+
+                return $template;
+        }
+}
+add_filter( 'template_include', 'bengpt_force_uniform_page_template', 50 );
