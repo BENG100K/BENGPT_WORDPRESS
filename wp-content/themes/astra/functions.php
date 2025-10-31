@@ -395,3 +395,72 @@ if ( ! function_exists( 'bengpt_force_uniform_page_template' ) ) {
         }
 }
 add_filter( 'template_include', 'bengpt_force_uniform_page_template', 50 );
+
+if ( ! function_exists( 'bengpt_rescue_page_from_404' ) ) {
+        /**
+         * Try to resolve pretty permalink 404s by matching the request path to a published page.
+         *
+         * This helps when the site's rewrite rules fall out of sync so friendly page URLs start
+         * returning a 404 even though the page exists.
+         *
+         * @param bool     $preempt  Whether to short-circuit default 404 handling.
+         * @param WP_Query $wp_query The main query instance.
+         *
+         * @return bool
+         */
+        function bengpt_rescue_page_from_404( $preempt, $wp_query ) {
+                if ( $preempt || is_admin() || ! $wp_query instanceof WP_Query || ! $wp_query->is_main_query() || ! $wp_query->is_404() ) {
+                        return $preempt;
+                }
+
+                $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+                $path        = trim( parse_url( $request_uri, PHP_URL_PATH ), '/' );
+
+                if ( '' === $path ) {
+                        return $preempt;
+                }
+
+                $home_path = trim( parse_url( home_url( '/' ), PHP_URL_PATH ), '/' );
+
+                if ( '' !== $home_path && 0 === strpos( $path, $home_path ) ) {
+                        $path = trim( substr( $path, strlen( $home_path ) ), '/' );
+                }
+
+                if ( '' === $path ) {
+                        return $preempt;
+                }
+
+                $candidate = get_page_by_path( $path );
+
+                if ( ! $candidate && str_contains( $path, '/' ) ) {
+                        $candidate = get_page_by_path( basename( $path ) );
+                }
+
+                if ( ! $candidate || 'page' !== $candidate->post_type || 'publish' !== $candidate->post_status ) {
+                        return $preempt;
+                }
+
+                $wp_query->queried_object    = $candidate;
+                $wp_query->queried_object_id = (int) $candidate->ID;
+                $wp_query->is_page           = true;
+                $wp_query->is_singular       = true;
+                $wp_query->is_single         = false;
+                $wp_query->is_attachment     = false;
+                $wp_query->is_404            = false;
+
+                $wp_query->set( 'page_id', (int) $candidate->ID );
+                $wp_query->set( 'pagename', get_page_uri( $candidate ) );
+
+                $wp_query->posts         = array( $candidate );
+                $wp_query->post          = $candidate;
+                $wp_query->found_posts   = 1;
+                $wp_query->post_count    = 1;
+                $wp_query->max_num_pages = 1;
+
+                status_header( 200 );
+                nocache_headers();
+
+                return true;
+        }
+}
+add_filter( 'pre_handle_404', 'bengpt_rescue_page_from_404', 10, 2 );
