@@ -396,6 +396,64 @@ if ( ! function_exists( 'bengpt_force_uniform_page_template' ) ) {
 }
 add_filter( 'template_include', 'bengpt_force_uniform_page_template', 50 );
 
+if ( ! function_exists( 'bengpt_map_request_to_existing_page' ) ) {
+        /**
+         * Populate request vars for pretty permalinks when rewrite rules are broken.
+         *
+         * @param array $query_vars Parsed query vars from WP::parse_request().
+         *
+         * @return array
+         */
+        function bengpt_map_request_to_existing_page( $query_vars ) {
+                if ( is_admin() ) {
+                        return $query_vars;
+                }
+
+                foreach ( array( 'page_id', 'pagename', 'name', 'post_type' ) as $protected_key ) {
+                        if ( ! empty( $query_vars[ $protected_key ] ) ) {
+                                return $query_vars;
+                        }
+                }
+
+                $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+                $path        = trim( parse_url( $request_uri, PHP_URL_PATH ), '/' );
+
+                if ( '' === $path ) {
+                        return $query_vars;
+                }
+
+                $home_path = trim( parse_url( home_url( '/' ), PHP_URL_PATH ), '/' );
+
+                if ( '' !== $home_path && 0 === strpos( $path, $home_path ) ) {
+                        $path = trim( substr( $path, strlen( $home_path ) ), '/' );
+                }
+
+                if ( '' === $path ) {
+                        return $query_vars;
+                }
+
+                $candidate = get_page_by_path( $path );
+
+                if ( ! $candidate && false !== strpos( $path, '/' ) ) {
+                        $candidate = get_page_by_path( basename( $path ) );
+                }
+
+                if ( ! $candidate || 'page' !== $candidate->post_type || 'publish' !== $candidate->post_status ) {
+                        return $query_vars;
+                }
+
+                $query_vars['page_id']  = (int) $candidate->ID;
+                $query_vars['pagename'] = get_page_uri( $candidate );
+
+                if ( isset( $query_vars['error'] ) && '404' === $query_vars['error'] ) {
+                        unset( $query_vars['error'] );
+                }
+
+                return $query_vars;
+        }
+}
+add_filter( 'request', 'bengpt_map_request_to_existing_page', 5 );
+
 if ( ! function_exists( 'bengpt_rescue_page_from_404' ) ) {
         /**
          * Try to resolve pretty permalink 404s by matching the request path to a published page.
@@ -432,7 +490,7 @@ if ( ! function_exists( 'bengpt_rescue_page_from_404' ) ) {
 
                 $candidate = get_page_by_path( $path );
 
-                if ( ! $candidate && str_contains( $path, '/' ) ) {
+                if ( ! $candidate && false !== strpos( $path, '/' ) ) {
                         $candidate = get_page_by_path( basename( $path ) );
                 }
 
