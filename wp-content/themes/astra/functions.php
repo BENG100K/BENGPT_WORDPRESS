@@ -205,3 +205,320 @@ require_once ASTRA_THEME_DIR . 'inc/core/markup/class-astra-markup.php';
 require_once ASTRA_THEME_DIR . 'inc/core/deprecated/deprecated-filters.php';
 require_once ASTRA_THEME_DIR . 'inc/core/deprecated/deprecated-hooks.php';
 require_once ASTRA_THEME_DIR . 'inc/core/deprecated/deprecated-functions.php';
+
+/**
+ * Enqueue global header and footer styling overrides.
+ */
+if ( ! function_exists( 'bengpt_uniform_header_footer_assets' ) ) {
+        /**
+         * Load the custom stylesheet that keeps header and footer styling consistent.
+         *
+         * @since 1.0.0 bengpt customization.
+         */
+        function bengpt_uniform_header_footer_assets() {
+                wp_enqueue_style(
+                        'bengpt-header-footer',
+                        ASTRA_THEME_URI . 'assets/css/custom-header-footer.css',
+                        array( 'astra-theme-css' ),
+                        ASTRA_THEME_VERSION
+                );
+        }
+}
+add_action( 'wp_enqueue_scripts', 'bengpt_uniform_header_footer_assets', 20 );
+
+if ( ! function_exists( 'bengpt_build_pages_menu_items' ) ) {
+        /**
+         * Build a navigation list that contains every published page so menus stay in sync automatically.
+         *
+         * @param WP_Nav_Menu_Args $context_args The arguments passed to wp_nav_menu().
+         *
+         * @return string
+         */
+        function bengpt_build_pages_menu_items( $context_args ) {
+                $list_args = array(
+                        'title_li'           => '',
+                        'echo'               => false,
+                        'sort_column'        => 'menu_order,post_title',
+                        'link_before'        => '',
+                        'link_after'         => '',
+                        'depth'              => 0,
+                        'bengpt_global_menu' => true,
+                );
+
+                if ( class_exists( 'Astra_Walker_Page' ) ) {
+                        $list_args['walker'] = new Astra_Walker_Page();
+                }
+
+                $current_id = get_queried_object_id();
+                if ( $current_id ) {
+                        $list_args['current_page'] = $current_id;
+                }
+
+                /**
+                 * Allow customization of the page query used to build the automatic navigation.
+                 *
+                 * @param array           $list_args    Arguments passed into wp_list_pages().
+                 * @param WP_Nav_Menu_Args $context_args Original nav menu arguments.
+                 */
+                $list_args = apply_filters( 'bengpt_global_pages_menu_args', $list_args, $context_args );
+
+                $pages_markup = trim( wp_list_pages( $list_args ) );
+
+                if ( '' === $pages_markup ) {
+                        return '';
+                }
+
+                $include_home = apply_filters( 'bengpt_global_pages_menu_include_home', 'page' !== get_option( 'show_on_front' ), $context_args );
+                $home_markup  = '';
+
+                if ( $include_home ) {
+                        $home_label = apply_filters( 'bengpt_global_pages_menu_home_label', __( 'Home', 'astra' ), $context_args );
+
+                        $home_classes = array(
+                                'menu-item',
+                                'menu-item-type-custom',
+                                'menu-item-object-custom',
+                                'menu-item-home',
+                                'page_item',
+                                'page-item-home',
+                        );
+
+                        if ( is_front_page() && ! is_paged() ) {
+                                $home_classes[] = 'current-menu-item';
+                                $home_classes[] = 'current_page_item';
+                        }
+
+                        $home_markup = sprintf(
+                                '<li class="%1$s"><a class="menu-link" href="%2$s">%3$s</a></li>',
+                                esc_attr( implode( ' ', array_unique( $home_classes ) ) ),
+                                esc_url( home_url( '/' ) ),
+                                esc_html( $home_label )
+                        );
+                }
+
+                return $home_markup . $pages_markup;
+        }
+}
+
+if ( ! function_exists( 'bengpt_force_all_pages_in_navigation' ) ) {
+        /**
+         * Replace targeted WordPress menus with an automatically generated list of all pages.
+         *
+         * @param string          $items Existing menu items markup.
+         * @param WP_Nav_Menu_Args $args  Menu arguments.
+         *
+         * @return string
+         */
+        function bengpt_force_all_pages_in_navigation( $items, $args ) {
+                if ( empty( $args->theme_location ) ) {
+                        return $items;
+                }
+
+                $target_locations = apply_filters( 'bengpt_global_pages_menu_locations', array( 'primary', 'mobile_menu' ), $args );
+
+                if ( ! in_array( $args->theme_location, $target_locations, true ) ) {
+                        return $items;
+                }
+
+                // Respect any menu items that have already been assigned to the location.
+                if ( '' !== trim( $items ) ) {
+                        return $items;
+                }
+
+                if ( function_exists( 'has_nav_menu' ) && has_nav_menu( $args->theme_location ) ) {
+                        return $items;
+                }
+
+                $pages_items = bengpt_build_pages_menu_items( $args );
+
+                if ( '' === $pages_items ) {
+                        return $items;
+                }
+
+                return $pages_items;
+        }
+}
+add_filter( 'wp_nav_menu_items', 'bengpt_force_all_pages_in_navigation', 20, 2 );
+
+if ( ! function_exists( 'bengpt_mark_pages_as_menu_items' ) ) {
+        /**
+         * Ensure automatically generated page links inherit menu item styling classes.
+         *
+         * @param array $css_class    Array of CSS classes to apply to the page menu item.
+         * @param WP_Post $page       The current page object.
+         * @param int   $depth        Menu depth.
+         * @param mixed $args         Arguments passed to wp_list_pages().
+         * @param int   $current_page Current page ID.
+         *
+         * @return array
+         */
+        function bengpt_mark_pages_as_menu_items( $css_class, $page, $depth, $args, $current_page ) {
+                $is_global_menu = false;
+
+                if ( is_array( $args ) && ! empty( $args['bengpt_global_menu'] ) ) {
+                        $is_global_menu = true;
+                } elseif ( is_object( $args ) && ! empty( $args->bengpt_global_menu ) ) {
+                        $is_global_menu = true;
+                }
+
+                if ( ! $is_global_menu ) {
+                        return $css_class;
+                }
+
+                $css_class[] = 'menu-item';
+                $css_class[] = 'menu-item-type-page';
+                $css_class[] = 'menu-item-object-page';
+
+                return array_values( array_unique( $css_class ) );
+        }
+}
+add_filter( 'page_css_class', 'bengpt_mark_pages_as_menu_items', 10, 5 );
+
+if ( ! function_exists( 'bengpt_force_uniform_page_template' ) ) {
+        /**
+         * Force every page to load the theme's default page template for visual consistency.
+         *
+         * @param string $template The path to the template WordPress resolved.
+         *
+         * @return string
+         */
+        function bengpt_force_uniform_page_template( $template ) {
+                if ( is_page() ) {
+                        $default_template = locate_template( 'page.php' );
+
+                        if ( $default_template && $default_template !== $template ) {
+                                return $default_template;
+                        }
+                }
+
+                return $template;
+        }
+}
+add_filter( 'template_include', 'bengpt_force_uniform_page_template', 50 );
+
+if ( ! function_exists( 'bengpt_map_request_to_existing_page' ) ) {
+        /**
+         * Populate request vars for pretty permalinks when rewrite rules are broken.
+         *
+         * @param array $query_vars Parsed query vars from WP::parse_request().
+         *
+         * @return array
+         */
+        function bengpt_map_request_to_existing_page( $query_vars ) {
+                if ( is_admin() ) {
+                        return $query_vars;
+                }
+
+                foreach ( array( 'page_id', 'pagename', 'name', 'post_type' ) as $protected_key ) {
+                        if ( ! empty( $query_vars[ $protected_key ] ) ) {
+                                return $query_vars;
+                        }
+                }
+
+                $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+                $path        = trim( parse_url( $request_uri, PHP_URL_PATH ), '/' );
+
+                if ( '' === $path ) {
+                        return $query_vars;
+                }
+
+                $home_path = trim( parse_url( home_url( '/' ), PHP_URL_PATH ), '/' );
+
+                if ( '' !== $home_path && 0 === strpos( $path, $home_path ) ) {
+                        $path = trim( substr( $path, strlen( $home_path ) ), '/' );
+                }
+
+                if ( '' === $path ) {
+                        return $query_vars;
+                }
+
+                $candidate = get_page_by_path( $path );
+
+                if ( ! $candidate && false !== strpos( $path, '/' ) ) {
+                        $candidate = get_page_by_path( basename( $path ) );
+                }
+
+                if ( ! $candidate || 'page' !== $candidate->post_type || 'publish' !== $candidate->post_status ) {
+                        return $query_vars;
+                }
+
+                $query_vars['page_id']  = (int) $candidate->ID;
+                $query_vars['pagename'] = get_page_uri( $candidate );
+
+                if ( isset( $query_vars['error'] ) && '404' === $query_vars['error'] ) {
+                        unset( $query_vars['error'] );
+                }
+
+                return $query_vars;
+        }
+}
+add_filter( 'request', 'bengpt_map_request_to_existing_page', 5 );
+
+if ( ! function_exists( 'bengpt_rescue_page_from_404' ) ) {
+        /**
+         * Try to resolve pretty permalink 404s by matching the request path to a published page.
+         *
+         * This helps when the site's rewrite rules fall out of sync so friendly page URLs start
+         * returning a 404 even though the page exists.
+         *
+         * @param bool     $preempt  Whether to short-circuit default 404 handling.
+         * @param WP_Query $wp_query The main query instance.
+         *
+         * @return bool
+         */
+        function bengpt_rescue_page_from_404( $preempt, $wp_query ) {
+                if ( $preempt || is_admin() || ! $wp_query instanceof WP_Query || ! $wp_query->is_main_query() || ! $wp_query->is_404() ) {
+                        return $preempt;
+                }
+
+                $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+                $path        = trim( parse_url( $request_uri, PHP_URL_PATH ), '/' );
+
+                if ( '' === $path ) {
+                        return $preempt;
+                }
+
+                $home_path = trim( parse_url( home_url( '/' ), PHP_URL_PATH ), '/' );
+
+                if ( '' !== $home_path && 0 === strpos( $path, $home_path ) ) {
+                        $path = trim( substr( $path, strlen( $home_path ) ), '/' );
+                }
+
+                if ( '' === $path ) {
+                        return $preempt;
+                }
+
+                $candidate = get_page_by_path( $path );
+
+                if ( ! $candidate && false !== strpos( $path, '/' ) ) {
+                        $candidate = get_page_by_path( basename( $path ) );
+                }
+
+                if ( ! $candidate || 'page' !== $candidate->post_type || 'publish' !== $candidate->post_status ) {
+                        return $preempt;
+                }
+
+                $wp_query->queried_object    = $candidate;
+                $wp_query->queried_object_id = (int) $candidate->ID;
+                $wp_query->is_page           = true;
+                $wp_query->is_singular       = true;
+                $wp_query->is_single         = false;
+                $wp_query->is_attachment     = false;
+                $wp_query->is_404            = false;
+
+                $wp_query->set( 'page_id', (int) $candidate->ID );
+                $wp_query->set( 'pagename', get_page_uri( $candidate ) );
+
+                $wp_query->posts         = array( $candidate );
+                $wp_query->post          = $candidate;
+                $wp_query->found_posts   = 1;
+                $wp_query->post_count    = 1;
+                $wp_query->max_num_pages = 1;
+
+                status_header( 200 );
+                nocache_headers();
+
+                return true;
+        }
+}
+add_filter( 'pre_handle_404', 'bengpt_rescue_page_from_404', 10, 2 );

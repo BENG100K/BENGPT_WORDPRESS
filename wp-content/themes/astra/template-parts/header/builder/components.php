@@ -30,15 +30,24 @@ switch ( $astra_header_component_slug ) {
 		<?php
 		break;
 
-case 'button-1':
-	?>
-	<div class="ast-builder-layout-element ast-flex site-header-focus-item ast-header-button-1" data-section="section-hb-button-1">
-		<a class="ast-header-custom-button" href="https://re-maxcommercial.ca/elementor-158/" style="background-color:#d32f2f; color:#fff; padding:10px 24px; border-radius:6px; text-decoration:none; font-weight:600;">
-			Pockets listings
-		</a>
-	</div>
-	<?php
-	break;
+        case 'button-1':
+                $bengpt_button_path = apply_filters( 'bengpt_header_primary_button_path', 'pockets-listings' );
+                $bengpt_button_post = function_exists( 'get_page_by_path' ) ? get_page_by_path( $bengpt_button_path ) : null;
+
+                if ( ! $bengpt_button_post && function_exists( 'get_page_by_title' ) ) {
+                        $bengpt_button_post = get_page_by_title( 'Pockets listings' );
+                }
+
+                $bengpt_button_url = $bengpt_button_post ? get_permalink( $bengpt_button_post ) : home_url( '/' );
+                $bengpt_button_url = apply_filters( 'bengpt_header_primary_button_url', $bengpt_button_url, $bengpt_button_post );
+                ?>
+                <div class="ast-builder-layout-element ast-flex site-header-focus-item ast-header-button-1" data-section="section-hb-button-1">
+                        <a class="ast-header-custom-button" href="<?php echo esc_url( $bengpt_button_url ); ?>" style="background-color:#d32f2f; color:#fff; padding:10px 24px; border-radius:6px; text-decoration:none; font-weight:600;">
+                                Pockets listings
+                        </a>
+                </div>
+                <?php
+                break;
 
 
 
