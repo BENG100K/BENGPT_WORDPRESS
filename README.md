@@ -15,3 +15,9 @@ API REST 24/7 hébergée gratuitement. Stack : FastAPI + Uvicorn.
 - Start : `uvicorn main:app --host=0.0.0.0 --port=10000`
 - Env var : `PORT=10000`
 - Webhook : remplacer l’URL fictive dans `.github/workflows/deploy.yml` par celui généré dans Render (si tu veux garder Render).
+
+## Dépannage installation (erreur proxy/403 PyPI)
+Si `pip install -r requirements.txt` échoue à cause d’un proxy (403 Forbidden), teste l’un de ces contournements :
+- Forcer l’index : `PIP_INDEX_URL=https://pypi.org/simple pip install -r requirements.txt`
+- Ajouter un index miroir : `PIP_EXTRA_INDEX_URL=https://pypi.python.org/simple pip install -r requirements.txt`
+- Si l’accès sortant est totalement bloqué, installe FastAPI et Uvicorn depuis un poste avec internet, exporte le dossier `.venv` ou un wheelhouse, puis copie-le avant de déployer.
